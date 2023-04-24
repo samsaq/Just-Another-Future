@@ -34,6 +34,7 @@
             title: "Animation still running",
             body: "Please wait for the animation to finish.",
         };
+        promptInput = "";
         modalStore.trigger(prevPromptUnfinished);
     }
   }
@@ -44,6 +45,7 @@
       title: "No Connection",
       body: "Please connect the Pi Zero to submit prompts.",
     };
+    promptInput = "";
     modalStore.trigger(NonConnectionError);
   }
 
