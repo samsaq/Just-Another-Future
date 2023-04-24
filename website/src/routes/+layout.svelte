@@ -6,7 +6,7 @@
 	// Finally, your application's global stylesheet (sometimes labeled 'app.css')
 	import '../app.postcss';
 	import { AppShell, AppBar, Modal, Toast } from '@skeletonlabs/skeleton';
-	import StarryBackground from "$lib/StarryBackground.svelte";
+	import StarryBackground from "$lib/starryBackground.svelte";
 </script>
 
 <!-- App Shell -->
