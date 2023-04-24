@@ -5,14 +5,14 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	// Finally, your application's global stylesheet (sometimes labeled 'app.css')
 	import '../app.postcss';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, Modal, Toast } from '@skeletonlabs/skeleton';
 </script>
 
 <!-- App Shell -->
 <AppShell>
-	<svelte:fragment slot="header">
-		
-	</svelte:fragment>
+	
 	<!-- Page Route Content -->
+	<Modal />
 	<slot />
+	<Toast max = {3} position = "b" background = "variant-filled-primary"/>
 </AppShell>

@@ -1,43 +1,74 @@
 <script lang="ts">
+  import { onMount, onDestroy } from "svelte";
+  import { app, getAnalytics, functions, database } from "../firebase.js";
+  import { ref, get, DataSnapshot, set, child } from "firebase/database";
+  import { modalStore } from "@skeletonlabs/skeleton";
+  import type { ModalSettings } from "@skeletonlabs/skeleton";
+  import { toastStore } from "@skeletonlabs/skeleton";
+  import type { ToastSettings } from "@skeletonlabs/skeleton";
 
-    import { onMount, onDestroy } from "svelte";
-    import { app, getAnalytics , functions, database } from '../firebase.js';
-    import { ref, get, DataSnapshot, set, child } from "firebase/database";
+  const promptRef = ref(database, "/futurePrompts");
+  let promptInput: string = "";
 
-    const MAX_PROMPTS = 100;
-    const promptRef = ref(database, "/futurePrompts")
+  export let isConnected: boolean = false;
 
-    async function addPrompt(promptText: string) {
-        const snapshot = await get(promptRef);
-        let startIdx = 0;
-        let numChildren = 0;
-        snapshot.forEach(child => {
-        numChildren++;
-        });
-        if (numChildren >= MAX_PROMPTS) { //to keep database size small, we will overwrite the oldest prompts
-            startIdx = (numChildren % MAX_PROMPTS) ;
-        } else {
-            startIdx = numChildren;
-        }
-        const newPromptRef = child(promptRef, `${startIdx}`);
+  async function updatePrompt(promptText: string) { //sets the curPrompt to the promptText
+    const snapshot = await get(promptRef);
+    const newPromptRef = child(promptRef, `curPrompt`);
+    const awaitingStatusRef = child(promptRef, `awaitingNewPrompt`);
+    const promptStatusSnapshot = await get(awaitingStatusRef);
+    const promptStatus = promptStatusSnapshot.val();
+    if(promptStatus === true)
+    {
         await set(newPromptRef, promptText);
+        const updatedToast: ToastSettings = {
+            message: "Prompt Submitted",
+            timeout: 3000,
+        };
+        toastStore.trigger(updatedToast);
     }
-
-    let promptInput: string = "";
-
-    function promptSubmission(event: KeyboardEvent) {
-        if (event.key === "Enter" && promptInput !== "") { // Using enter key to submit
-            console.log(promptInput);
-            addPrompt(promptInput);
-        }
+    else
+    {
+        const prevPromptUnfinished: ModalSettings = {
+            type: "alert",
+            title: "Animation still running",
+            body: "Please wait for the animation to finish.",
+        };
+        modalStore.trigger(prevPromptUnfinished);
     }
+  }
 
+  function submissionFailure() {
+    const NonConnectionError: ModalSettings = {
+      type: "alert",
+      title: "No Connection",
+      body: "Please connect the Pi Zero to submit prompts.",
+    };
+    modalStore.trigger(NonConnectionError);
+  }
+
+  function promptSubmission(event: KeyboardEvent) {
+    if (isConnected) {
+      if (event.key === "Enter" && promptInput !== "") {
+        // Using enter key to submit
+        console.log("updating curPrompt to: " + promptInput);
+        updatePrompt(promptInput);
+      }
+    } else {
+      submissionFailure();
+    }
+  }
 </script>
 
 <label class="label">
-    <input class="input" type="text" placeholder="Imagine the future..." bind:value={promptInput} on:keydown={promptSubmission}/>
+  <input
+    class="input"
+    type="text"
+    placeholder="Imagine the future..."
+    bind:value={promptInput}
+    on:keydown={promptSubmission}
+  />
 </label>
 
 <style lang="postcss">
-
 </style>

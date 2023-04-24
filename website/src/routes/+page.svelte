@@ -3,6 +3,7 @@
 	import { database} from "../firebase";
 	import { ref, onValue, DataSnapshot } from "firebase/database";
 	import { onMount, onDestroy } from "svelte";
+	import StarryBackground from "$lib/starryBackground.svelte";
 
 	let isConnected = false;
 	let piZeroRef = ref(database, 'connections/pi-zero');
@@ -30,7 +31,7 @@
 <div class="container h-full mx-auto flex justify-center items-center Background flex-col">
 	<h2>Coming Soon</h2>
 	<div class="space-y-10 text-center py-8">
-		<PromptInput/>
+		<PromptInput isConnected={isConnected}/>
 		<div class="text-center">
 			{#if isConnected}
 				<p>Connected to Pi Zero</p>
