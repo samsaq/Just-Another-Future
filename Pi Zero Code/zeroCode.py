@@ -10,7 +10,7 @@ from firebase_admin import db
 
 
 # firebase config
-config = {
+configFirebase = {
     apiKey: "AIzaSyBa7WNFwugtTqRwm8hqMsMgeExmRX_tEpw",
     authDomain: "just-another-future.firebaseapp.com",
     databaseURL: 'https://just-another-future-default-rtdb.asia-southeast1.firebasedatabase.app',
@@ -20,6 +20,11 @@ config = {
     appId: "1:1001702454477:web:8068c9f2f39ded3bb76584",
     measurementId: "G-XEE5RNJMHF"
 }
+
+# set openai key, read in from openaiKey.txt
+openaiKeyFile = open('openaiKey.txt', 'r')
+openai.api_key = openaiKeyFile.read()
+openaiKeyFile.close()
 
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('just-another-future-firebase-adminsdk-1x2xw-8e2b5e3b5f.json')
