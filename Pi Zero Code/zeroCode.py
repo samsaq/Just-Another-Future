@@ -8,6 +8,8 @@ import requests, os, pygame, firebase_admin, openai
 from firebase_admin import credentials
 from firebase_admin import db
 
+loading = False # boolean to track if the pi zero is currently loading an image
+debug = True
 
 # firebase config
 configFirebase = {
@@ -20,6 +22,13 @@ configFirebase = {
     appId: "1:1001702454477:web:8068c9f2f39ded3bb76584",
     measurementId: "G-XEE5RNJMHF"
 }
+
+# pygame initializations
+pygame.init()
+
+# Set up the Pygame window and the clock
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+clock = pygame.time.Clock()
 
 # set openai key, read in from openaiKey.txt
 openaiKeyFile = open('openaiKey.txt', 'r')
@@ -57,6 +66,32 @@ def getCurPrompt():
     ref = db.reference('futurePrompts/curPrompt')
     return ref.get()
 
+# loading screen function
+def displayLoading(screen):
+    # Define the loading screen message and font
+    loadingMessage = "Loading..."
+    loadingFont = pygame.font.Font(None, 36)
+
+    # Create a surface for the loading screen
+    loadingScreen = pygame.Surface(screen.get_size())
+    loadingScreen = loadingScreen.convert()
+    loadingScreen.fill((0, 0, 0))  # fill the screen with a black background
+
+    # Display the loading message on the loading screen
+    text = loadingFont.render(loadingMessage, 1, (255, 255, 255)) # white loading text
+    textPos = text.get_rect(centerx=loadingScreen.get_width()/2,
+                              centery=loadingScreen.get_height()/2)
+    loadingScreen.blit(text, textPos)
+
+    # Display the loading screen on the main window
+    screen.blit(loadingScreen, (0, 0))
+    pygame.display.flip()
+
+# function to use already generated images to display on the pi zero & transition
+def displayArt():
+    if(not loading):
+        pass
+
 # defining the core callback function that triggers when the pi zero
 # gets a new prompt via a change in the database's curPrompt value
 def onCurPromptChange():
@@ -76,6 +111,11 @@ def onCurPromptChange():
     # query the openai dalle api for the prompt to get a generated image
     # and save the image to the subfolder for the current prompt
     # we'll use the prompt as the image name
+
+    # set the loading boolean to true & display the loading screen
+    loading = True
+    displayLoading(screen)
+
     response = openai.Image.create(
         prompt = curPrompt,
         n = 1,
@@ -84,7 +124,26 @@ def onCurPromptChange():
     image_url = response['data'][0]['url']
     # download the image to the subfolder for the current prompt
     r = requests.get(image_url, allow_redirects=True)
-    open('images/' + sanatizedPrompt + '/' + curPrompt + '.jpg', 'wb').write(r.content)
+    open('images/' + sanatizedPrompt + '/' + 'promptImage' + '.jpg', 'wb').write(r.content)
+
+    # now to get the variants of the image (8 of them, for now)
+    variants = openai.Image.create_variation(
+        # based off of the current prompt image
+        image = open('images/' + sanatizedPrompt + '/' + 'promptImage' + '.jpg', 'rb'),
+        n=8,
+        size = "1024x1024"
+    )
+    # use the urls to download the images to the variants subfolder
+    for i in range(8):
+        variant_url = variants['data'][i]['url']
+        r = requests.get(variant_url, allow_redirects=True)
+        open('images/' + sanatizedPrompt + '/variants/' + 'variant' + str(i) + '.jpg', 'wb').write(r.content)
+
+    # set the loading boolean to false
+    loading = False
+
+    # function call to update and display UI goes here
+    displayArt()
 
 
 # when the script begins, update the pi zero's connection status to true
@@ -96,3 +155,20 @@ curPromptRef.listen(onCurPromptChange())
 
 # TODO: make sure the listener gets closed when the script ends & refractor as needed for response times
 # we also should double check line 82 to see if the curPrompt used might cause name issues
+
+# Start the Pygame event loop to handle events and update the display
+running = True
+while running and not debug:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False
+        elif event.type == pygame.USEREVENT:
+            display_next_image()
+
+    # Limit the frame rate to 60 fps
+    clock.tick(60)
+
+# Quit Pygame and exit the program
+pygame.quit()
