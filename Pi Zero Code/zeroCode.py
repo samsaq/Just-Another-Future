@@ -164,8 +164,7 @@ while running and not debug:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
-        elif event.type == pygame.USEREVENT:
-            display_next_image()
+            # swap userEvent for the listener trigger? Maybe trigger an event on listener triggering
 
     # Limit the frame rate to 60 fps
     clock.tick(60)
