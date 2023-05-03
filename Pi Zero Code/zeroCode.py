@@ -4,7 +4,7 @@
 # and after the first prompted image is displayed, fade between the generated variants
 # do so until the screen is touched or X time passes
 # should be at an intro screen of some kind while awaiting a new prompt
-import requests, os, pygame, firebase_admin, openai
+import requests, os, pygame, firebase_admin, openai, time
 from firebase_admin import credentials
 from firebase_admin import db
 
@@ -89,8 +89,38 @@ def displayLoading(screen):
 
 # function to use already generated images to display on the pi zero & transition
 def displayArt():
-    if(not loading):
+    if(not loading): 
+        # once loading is done, remove the loading screen & display the images in a loop with a fade transition
+        # the first prompt image should be in the images folder, in a subfolder named after the prompt
+        # the following variants should be in a subfolder named variants
+        # We'll stay on each image for 5 seconds, then fade to the next one
+        # After 2 loops, we'll go back to the intro screen
+
+        # get the relevant images
+
+
         pass
+
+# function to display the intro screen where the pi zero awaits a new prompt
+def displayIntro():
+    # Define the intro screen message and font
+    introMessage = "Imagine the future..."
+    introFont = pygame.font.Font(None, 36)
+
+    # Create a surface for the intro screen
+    introScreen = pygame.Surface(screen.get_size())
+    introScreen = introScreen.convert()
+    introScreen.fill((0, 0, 0))  # fill the screen with a black background
+
+    # Display the intro message on the intro screen
+    text = introFont.render(introMessage, 1, (255, 255, 255)) # white intro text
+    textPos = text.get_rect(centerx=introScreen.get_width()/2,
+                              centery=introScreen.get_height()/2)
+    introScreen.blit(text, textPos)
+
+    # Display the intro screen on the main window
+    screen.blit(introScreen, (0, 0))
+    pygame.display.flip()
 
 # defining the core callback function that triggers when the pi zero
 # gets a new prompt via a change in the database's curPrompt value
