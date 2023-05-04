@@ -13,7 +13,7 @@
 		console.log('Attaching listener to', piZeroRef.toString());
 		unsubscribeIsConnected = onValue(piZeroRef, (snapshot: DataSnapshot) => {
 			//console.log('Value changed to', snapshot.val());
-			isConnected = snapshot.val();
+			isConnected = snapshot.val().connected;
 		});
 	});
 
