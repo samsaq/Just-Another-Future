@@ -8,7 +8,7 @@ import requests, os, pygame, firebase_admin, openai, time, sys
 from firebase_admin import credentials
 from firebase_admin import db
 
-debug = True
+debug = False
 numVariants = 2 # number of variants to generate for each prompt
 
 # Get the current directory
@@ -290,4 +290,5 @@ while running:
 
 # Quit Pygame and exit the program
 updateConnectionStatus(False)  # update the connection status to false
+updateAwaitingPrompt(True)
 pygame.quit()
