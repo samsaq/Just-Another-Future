@@ -18,7 +18,7 @@
     const awaitingStatusRef = child(promptRef, `awaitingNewPrompt`);
     const promptStatusSnapshot = await get(awaitingStatusRef);
     const promptStatus = promptStatusSnapshot.val();
-    if(promptStatus === true)
+    if(promptStatus.awaiting === true)
     {
         await set(newPromptRef, promptText);
         const updatedToast: ToastSettings = {
