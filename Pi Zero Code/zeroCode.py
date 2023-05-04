@@ -4,7 +4,7 @@
 # and after the first prompted image is displayed, fade between the generated variants
 # do so until the screen is touched or X time passes
 # should be at an intro screen of some kind while awaiting a new prompt
-import requests, os, pygame, firebase_admin, openai, time, sys
+import requests, os, pygame, firebase_admin, openai, time, sys, signal
 from firebase_admin import credentials
 from firebase_admin import db
 
@@ -255,6 +255,13 @@ def loadImages():
         if numImagesDownloaded < numExpectedImages:
             # wait for a bit before checking again
             time.sleep(0.5)
+
+def handleQuitSignal(signal, frame):
+    pygame.quit()
+    sys.exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGUSR1, handleQuitSignal)
 
 # setup a listener for the curPrompt value in the database
 curPromptRef = db.reference('/futurePrompts/curPrompt/')
