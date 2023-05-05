@@ -90,7 +90,7 @@ def displayLoading(screen):
 
     # Display the loading message on the loading screen
     text = loadingFont.render(loadingMessage, 1, (255, 255, 255)) # white loading text
-    textPos = text.get_rect(centerx=loadingScreen.get_width()/2,
+    textPos = text.get_rect(centerx=loadingScreen.get_width()/3.5, # offset for the view being streamed to the zero
                               centery=loadingScreen.get_height()/2)
     loadingScreen.blit(text, textPos)
 
@@ -140,7 +140,7 @@ def displayIntro():
 
     # Display the intro message on the intro screen
     text = introFont.render(introMessage, 1, (0, 0, 0)) # black intro text
-    textPos = text.get_rect(centerx=introScreen.get_width()/2,
+    textPos = text.get_rect(centerx=introScreen.get_width()/3.5,
                               centery=introScreen.get_height()/2)
     introScreen.blit(text, textPos)
 
@@ -261,7 +261,7 @@ def handleQuitSignal(signal, frame):
     sys.exit(0)
 
 # Register the signal handler
-signal.signal(signal.SIGUSR1, handleQuitSignal)
+signal.signal(signal.SIGINT, handleQuitSignal)
 
 # setup a listener for the curPrompt value in the database
 curPromptRef = db.reference('/futurePrompts/curPrompt/')
