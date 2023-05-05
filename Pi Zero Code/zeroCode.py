@@ -45,7 +45,7 @@ openai.api_key = openaiKeyFile.read()
 openaiKeyFile.close()
 
 # Fetch the service account key JSON file contents
-cred = credentials.Certificate('just-another-future-firebase-adminsdk-vy89h-b2ad978410.json')
+cred = credentials.Certificate('just-another-future-firebase-adminsdk-vy89h-a5553ac8b3.json')
 
 # Initialize the app with a service account, granting admin privileges & the other config info
 firebase_admin.initialize_app(cred, {
@@ -115,16 +115,18 @@ def displayArt():
     # Display the prompt image on the main window with a transition from the previous loading screen
     currentScreen = pygame.display.get_surface()
     transitionImages(screen, currentScreen, promptImage)
-    time.sleep(4)
+    time.sleep(6)
 
-    # now do the loop for the variants
-    for i in range (len(variantsArray)):
-        # Display the variant image on the main window with a transition from the previous image
-        currentScreen = pygame.display.get_surface()
-        transitionImages(screen, currentScreen, variantsArray[i])
+    for i in range (3): # repeating the loop 3 times
+        # now do the loop for the variants
+        for i in range (len(variantsArray)):
+            # Display the variant image on the main window with a transition from the previous image
+            currentScreen = pygame.display.get_surface()
+            transitionImages(screen, currentScreen, variantsArray[i])
 
-        # wait 4 seconds
-        time.sleep(4)
+            # wait 6 seconds
+            time.sleep(6)
+    
 
 
 # function to display the intro screen where the pi zero awaits a new prompt
